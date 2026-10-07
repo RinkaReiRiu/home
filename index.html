@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Dashboard</title>
+    <style>
+        :root {
+            --glass-bg: rgba(30, 30, 30, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            --text-color: #f0f0f0;
+            --theme-color: #4facfe;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            min-height: 100vh;
+            color: var(--text-color);
+            background-color: #121212;
+            background-image: url('https://images.unsplash.com/photo-1707343843437-caacff5cfa74?q=80&w=1920&auto=format&fit=crop'); /* 預設優美背景 */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        /* 利用偽元素或 Overlay 做出背景霧化，避免內容被霧化 */
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            backdrop-filter: blur(12px) brightness(0.6);
+            -webkit-backdrop-filter: blur(12px) brightness(0.6);
+            z-index: -1;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem; }
+        h1 { font-size: 2.2rem; font-weight: 600; letter-spacing: 1px; }
+        .controls { display: flex; gap: 12px; flex-wrap: wrap; }
+        button, .btn-upload {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            color: #fff; padding: 10px 18px; border-radius: 10px;
+            cursor: pointer; backdrop-filter: blur(10px); font-size: 0.95rem;
+            transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center;
+        }
+        button:hover, .btn-upload:hover { background: rgba(255,255,255,0.15); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        input[type="file"] { display: none; }
+        
+        nav { display: flex; gap: 1rem; margin-bottom: 2.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 1rem; overflow-x: auto; scrollbar-width: none; }
+        nav::-webkit-scrollbar { display: none; }
+        .tab {
+            padding: 10px 24px; cursor: pointer; border-radius: 10px;
+            background: transparent; border: 1px solid transparent; color: #aaa;
+            transition: all 0.3s; white-space: nowrap; font-size: 1.05rem; font-weight: 500;
+        }
+        .tab.active {
+            background: var(--glass-bg); border: 1px solid var(--glass-border); color: #fff;
+            box-shadow: var(--glass-shadow); backdrop-filter: blur(10px);
+        }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+        .card {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 1.8rem 1.5rem; display: flex; flex-direction: column;
+            align-items: center; text-align: center; box-shadow: var(--glass-shadow);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease; position: relative;
+            text-decoration: none; color: inherit; overflow: hidden;
+        }
+        .card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.1); border-color: rgba(255,255,255,0.3); }
+        .card img { width: 56px; height: 56px; border-radius: 14px; margin-bottom: 1.2rem; object-fit: cover; background: #fff; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
+        .card h3 { font-size: 1.15rem; margin-bottom: 0.5rem; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+        .card p { font-size: 0.85rem; color: #bbb; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .card-actions { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.3s; }
+        .card:hover .card-actions { opacity: 1; }
+        .icon-btn { 
+            background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); color: white; 
+            border-radius: 8px; width: 32px; height: 32px; padding: 0;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; backdrop-filter: blur(4px);
+        }
+        .icon-btn:hover { background: rgba(255,255,255,0.2); }
+        
+        .add-card { border: 2px dashed rgba(255,255,255,0.2); justify-content: center; background: transparent; box-shadow: none; cursor: pointer; }
+        .add-card:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.4); }
+        .add-card div { font-size: 2.5rem; font-weight: 300; line-height: 1; color: #aaa; margin-bottom: 10px; transition: color 0.3s; }
+        .add-card:hover div { color: #fff; }
+        
+        dialog {
+            border: 1px solid var(--glass-border); border-radius: 20px; padding: 2.5rem;
+            background: rgba(20, 20, 20, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            color: white; margin: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); width: 90%; max-width: 420px;
+        }
+        dialog::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); }
+        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        .form-group label { display: block; margin-bottom: 0.6rem; font-size: 0.95rem; color: #ddd; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.2); color: white; outline: none; font-size: 1rem; transition: border 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: var(--theme-color); background: rgba(0,0,0,0.4); }
+        .form-group select option { background: #222; color: white; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 2rem; }
+        .modal-actions button { min-width: 90px; }
+        .btn-primary { background: rgba(79, 172, 254, 0.4); border-color: rgba(79, 172, 254, 0.6); }
+        .btn-primary:hover { background: rgba(79, 172, 254, 0.6); }
+
+        @media (max-width: 768px) {
+            .container { padding: 1.5rem; }
+            header { flex-direction: column; align-items: flex-start; }
+            .controls { width: 100%; justify-content: flex-start; }
+            .card-actions { opacity: 1; /* 手機版預設顯示操作按鈕 */ }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-overlay"></div>
+    <div class="container">
+        <header>
+            <h1>My Dashboard</h1>
+            <div class="controls">
+                <label class="btn-upload">
+                    🖼️ 上傳背景 <input type="file" id="bgInput" accept="image/*">
+                </label>
+                <button id="exportCsv">📥 匯出 CSV</button>
+                <label class="btn-upload">
+                    📤 匯入 CSV <input type="file" id="importCsv" accept=".csv">
+                </label>
+            </div>
+        </header>
+        
+        <nav id="tabsContainer"></nav>
+        
+        <main>
+            <div class="grid" id="shortcutsGrid"></div>
+        </main>
+    </div>
+
+    <dialog id="shortcutModal">
+        <h2 id="modalTitle" style="margin-bottom: 1.5rem; font-weight: 500;">新增捷徑</h2>
+        <form id="shortcutForm">
+            <input type="hidden" id="shortcutId">
+            <div class="form-group">
+                <label>分類</label>
+                <select id="shortcutCategory" required></select>
+            </div>
+            <div class="form-group">
+                <label>網站名稱</label>
+                <input type="text" id="shortcutName" required placeholder="例如：Google">
+            </div>
+            <div class="form-group">
+                <label>網址</label>
+                <input type="url" id="shortcutUrl" required placeholder="例如：https://www.google.com">
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="cancelBtn">取消</button>
+                <button type="submit" class="btn-primary">儲存</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script>
+        const tabs = ['學校作業', '工作工具', '休閒娛樂'];
+        // 預設資料
+        let shortcuts = JSON.parse(localStorage.getItem('my_shortcuts')) || [
+            { id: '1', category: '學校作業', name: 'Google Classroom', url: 'https://classroom.google.com' },
+            { id: '2', category: '工作工具', name: 'GitHub', url: 'https://github.com' },
+            { id: '3', category: '工作工具', name: 'Stack Overflow', url: 'https://stackoverflow.com' },
+            { id: '4', category: '休閒娛樂', name: 'YouTube', url: 'https://www.youtube.com' },
+            { id: '5', category: '休閒娛樂', name: 'Netflix', url: 'https://www.netflix.com' }
+        ];
+        let currentTab = tabs[0];
+
+        const elements = {
+            bgInput: document.getElementById('bgInput'),
+            exportCsv: document.getElementById('exportCsv'),
+            importCsv: document.getElementById('importCsv'),
+            tabs: document.getElementById('tabsContainer'),
+            grid: document.getElementById('shortcutsGrid'),
+            modal: document.getElementById('shortcutModal'),
+            form: document.getElementById('shortcutForm'),
+            cancelBtn: document.getElementById('cancelBtn'),
+            catSelect: document.getElementById('shortcutCategory')
+        };
+
+        function init() {
+            loadBackground();
+            initCategorySelect();
+            renderTabs();
+            renderGrid();
+            setupEventListeners();
+        }
+
+        function initCategorySelect() {
+            elements.catSelect.innerHTML = tabs.map(t => `<option value="${t}">${t}</option>`).join('');
+        }
+
+        function loadBackground() {
+            const bgData = localStorage.getItem('my_bg');
+            if (bgData) document.body.style.backgroundImage = `url(${bgData})`;
+        }
+
+        function renderTabs() {
+            elements.tabs.innerHTML = tabs.map(tab => 
+                `<button class="tab ${tab === currentTab ? 'active' : ''}" data-tab="${tab}">${tab}</button>`
+            ).join('');
+            
+            document.querySelectorAll('.tab').forEach(btn => {
+                btn.onclick = () => { currentTab = btn.dataset.tab; renderTabs(); renderGrid(); };
+            });
+        }
+
+        function renderGrid() {
+            elements.grid.innerHTML = '';
+            const filtered = shortcuts.filter(s => s.category === currentTab);
+            
+            filtered.forEach(s => {
+                const domain = getDomain(s.url);
+                // 自動獲取 Favicon (Google S2 API)
+                const iconUrl = `https://s2.googleusercontent.com/s2/favicons?domain=${domain}&sz=128`;
+                
+                const card = document.createElement('a');
+                card.href = s.url;
+                card.target = '_blank';
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-actions">
+                        <button class="icon-btn edit-btn" data-id="${s.id}" title="編輯">✎</button>
+                        <button class="icon-btn del-btn" data-id="${s.id}" title="刪除">✕</button>
+                    </div>
+                    <img src="${iconUrl}" alt="${s.name}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2RkZCIvPjwvc3ZnPg=='">
+                    <h3>${s.name}</h3>
+                    <p>${domain}</p>
+                `;
+                
+                // 阻止 a 標籤預設跳轉行為，觸發編輯與刪除
+                card.querySelector('.edit-btn').onclick = (e) => { e.preventDefault(); openModal(s); };
+                card.querySelector('.del-btn').onclick = (e) => { e.preventDefault(); deleteShortcut(s.id); };
+                elements.grid.appendChild(card);
+            });
+
+            // 新增按鈕卡片
+            const addBtn = document.createElement('div');
+            addBtn.className = 'card add-card';
+            addBtn.innerHTML = '<div>+</div><h3>新增捷徑</h3>';
+            addBtn.onclick = () => openModal();
+            elements.grid.appendChild(addBtn);
+        }
+
+        function getDomain(url) {
+            try { return new URL(url).hostname; } catch { return url; }
+        }
+
+        function saveToLocal() {
+            localStorage.setItem('my_shortcuts', JSON.stringify(shortcuts));
+            renderGrid();
+        }
+
+        function openModal(shortcut = null) {
+            if (shortcut) {
+                document.getElementById('modalTitle').textContent = '編輯捷徑';
+                document.getElementById('shortcutId').value = shortcut.id;
+                elements.catSelect.value = shortcut.category;
+                document.getElementById('shortcutName').value = shortcut.name;
+                document.getElementById('shortcutUrl').value = shortcut.url;
+            } else {
+                document.getElementById('modalTitle').textContent = '新增捷徑';
+                elements.form.reset();
+                document.getElementById('shortcutId').value = '';
+                elements.catSelect.value = currentTab;
+            }
+            elements.modal.showModal();
+        }
+
+        function deleteShortcut(id) {
+            if (confirm('確定要刪除這個捷徑嗎？')) {
+                shortcuts = shortcuts.filter(s => s.id !== id);
+                saveToLocal();
+            }
+        }
+
+        function setupEventListeners() {
+            elements.cancelBtn.onclick = () => elements.modal.close();
+            
+            elements.form.onsubmit = (e) => {
+                e.preventDefault();
+                let url = document.getElementById('shortcutUrl').value;
+                if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+                const data = {
+                    category: elements.catSelect.value,
+                    name: document.getElementById('shortcutName').value,
+                    url: url
+                };
+                const id = document.getElementById('shortcutId').value;
+
+                if (id) {
+                    const idx = shortcuts.findIndex(s => s.id === id);
+                    if (idx > -1) shortcuts[idx] = { ...shortcuts[idx], ...data };
+                } else {
+                    shortcuts.push({ id: Date.now().toString(), ...data });
+                }
+                saveToLocal();
+                elements.modal.close();
+            };
+
+            // 上傳並壓縮背景圖片存入 LocalStorage
+            elements.bgInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 1920;
+                        let w = img.width, h = img.height;
+                        if (w > MAX_WIDTH) { h *= MAX_WIDTH / w; w = MAX_WIDTH; }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        
+                        try {
+                            localStorage.setItem('my_bg', canvas.toDataURL('image/jpeg', 0.6));
+                            loadBackground();
+                        } catch (err) {
+                            alert('圖片儲存失敗，可能超出 LocalStorage 5MB 容量限制。請嘗試更小的圖片！');
+                        }
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // 匯出 CSV 功能
+            elements.exportCsv.onclick = () => {
+                if (!shortcuts.length) return alert('沒有資料可匯出！');
+                const csvContent = "category,name,url\n" + shortcuts.map(s => 
+                    `"${s.category}","${s.name.replace(/"/g, '""')}","${s.url}"`
+                ).join('\n');
+                
+                const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'shortcuts.csv';
+                link.click();
+            };
+
+            // 匯入 CSV 功能
+            elements.importCsv.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const lines = event.target.result.split('\n').filter(l => l.trim());
+                    if (lines.length < 2) return alert('CSV 為空或格式錯誤');
+                    
+                    const newShortcuts = [];
+                    for (let i = 1; i < lines.length; i++) {
+                        const row = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                        if (row && row.length >= 3) {
+                            const cat = row[0].replace(/^"|"$/g, '').trim();
+                            const name = row[1].replace(/^"|"$/g, '').trim().replace(/""/g, '"');
+                            const url = row[2].replace(/^"|"$/g, '').trim();
+                            if (tabs.includes(cat) && name && url) {
+                                newShortcuts.push({ id: Date.now().toString() + i, category: cat, name, url });
+                            }
+                        }
+                    }
+                    if (newShortcuts.length) {
+                        shortcuts = newShortcuts;
+                        saveToLocal();
+                        currentTab = tabs[0];
+                        renderTabs();
+                        alert(`成功匯入 ${newShortcuts.length} 筆資料！`);
+                    } else {
+                        alert('未找到符合格式的資料。');
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
