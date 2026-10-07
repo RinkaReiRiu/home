@@ -1,4 +1,5 @@
 # home
+
 This is Riu's personal home page made with Google Gemini. It's also the assignment of GAI in 2026 fall.
 
 這次作業要我設計一個自己覺得有趣且有動機製作的網頁應用程式。透過利用AI協助我從說出想像的畫面，到最後以Vibe Coding的方式，完成可實際操作的網頁。
@@ -15,6 +16,16 @@ This is Riu's personal home page made with Google Gemini. It's also the assignme
 讓我從跟AI對話開始企劃這個網頁應用程式並撰寫規格書。
 
 - 我要撰寫一段提示詞。你必須分析我的需求，先不進行行動。等到決定所有的需求，確認完達成成就的方法，以及設立最終目標之後，你才能開始生成合適的提示詞並行動。
+
+<img width="865" height="844" alt="image" src="https://github.com/user-attachments/assets/2cf3e8bc-ec42-4fb9-9272-b1d7c47e347a" />
+
+<img width="865" height="414" alt="image" src="https://github.com/user-attachments/assets/5ef50ed5-6244-4c36-b613-c750368bcba3" />
+
+<img width="865" height="373" alt="image" src="https://github.com/user-attachments/assets/51048212-e634-4208-9678-f38ce40ab941" />
+
+<img width="865" height="694" alt="image" src="https://github.com/user-attachments/assets/2d5fb013-e862-47ec-92a7-c3a9da642e0c" />
+
+<img width="865" height="528" alt="image" src="https://github.com/user-attachments/assets/7a3a2341-fbb6-47c5-8402-40b9af95ac90" />
 
 我希望可以自行上傳背景圖片，背景圖片會霧化處理；自動取得捷徑圖示；此網頁必須適用於所有裝置，依照畫面大小及比例自動適配性調整。我希望網頁本身具備新增、編輯、刪除按鈕的功能，具備三個頁籤（學校作業、工作工具、休閒娛樂），且可以跨裝置聯動更改畫面；所有的網址、網頁簡稱以獨立的csv檔案儲存，讓我可以輕鬆新增並編輯。我希望輸入給LLM時，它能生成完整且無錯誤的單一整合檔及獨立csv檔案。
 
@@ -72,26 +83,44 @@ This is Riu's personal home page made with Google Gemini. It's also the assignme
 
 AI根據我提供的規格書，讓我透過Vibe Coding完成第一版的程式碼，包含一HTML整合檔和一csv檔案。HTML程式碼用於網站設計與互動功能，csv檔案彙整了所有的網站名稱、網址和分類。
 
+<img width="865" height="841" alt="image" src="https://github.com/user-attachments/assets/8ba6cea4-ba02-4cc4-9908-88d411d7bf65" />
+
 我跟AI說沒有完整顯示出csv檔的所有網址，其他部分測試過後沒有發現問題。意外的只有這一個小錯誤。
 
+<img width="865" height="377" alt="image" src="https://github.com/user-attachments/assets/d3dcf19d-d8bc-4c14-8c9d-e13790a62952" />
+
 這是預設的網站頁面。
+
+<img width="865" height="563" alt="image" src="https://github.com/user-attachments/assets/63154915-0ef7-4d63-9a02-4910993b5c92" />
  
 預設的網站頁面背景圖片來源為Unsplash圖庫，為免費商用授權圖片。
- 
+
+<img width="865" height="567" alt="image" src="https://github.com/user-attachments/assets/12fd4804-22b7-4039-a70c-a7f1be2acde9" />
+
 上傳背景圖片後的實際上畫面如下圖。這張圖片是我的自拍照。
 
+<img width="865" height="563" alt="image" src="https://github.com/user-attachments/assets/b35046e8-aef4-4188-bd7f-6fc91115de41" />
+
 還可以在頁面上新增捷徑，並匯出csv備份自己的設置到其他裝置。
- 
+
+<img width="509" height="597" alt="image" src="https://github.com/user-attachments/assets/789f8a85-076d-4e35-9f56-e79cb3eb858e" />
+
+<img width="865" height="319" alt="image" src="https://github.com/user-attachments/assets/ffef91f0-1ffb-472f-9164-483fa7a54299" />
+
+<img width="850" height="242" alt="image" src="https://github.com/user-attachments/assets/bf17a1ac-d615-4777-acfa-17178e7267bb" />
+
 ---
 
 
 ## 步驟三：將作品上傳到 GitHub，並使用 GitHub Pages 公開網站。
 
 最後，只要上傳到GitHub並公開就完成了。
- 
-GitHub Repo： https://github.com/RinkaReiRiu/home/
 
-GitHub Pages： https://rinkareiriu.github.io/home/
+<img width="850" height="242" alt="image" src="https://github.com/user-attachments/assets/f6e814e6-3307-47df-ad37-efe9eb2d6623" />
+ 
+GitHub Repo： [https://github.com/RinkaReiRiu/home/](https://github.com/RinkaReiRiu/home/)
+
+GitHub Pages： [https://rinkareiriu.github.io/home/](https://rinkareiriu.github.io/home/)
 
 ---
 
