@@ -89,7 +89,8 @@ AI根據我提供的規格書，讓我透過Vibe Coding完成第一版的程式�
 
 最後，只要上傳到GitHub並公開就完成了。
  
-GitHub Repo： https://github.com/RinkaReiRiu/home
+GitHub Repo： https://github.com/RinkaReiRiu/home/
+
 GitHub Pages： https://rinkareiriu.github.io/home/
 
 ---
