@@ -138,3 +138,14 @@ GitHub Pages： [https://rinkareiriu.github.io/home/](https://rinkareiriu.github
 
 ---
 
+
+## 20261010 更新
+
+為了讓網頁預設讀取csv檔案，我做了一些修正。網頁會優先讀取本地內存，再來是放在GitHub的csv檔案，最後才是預設的五個網站。
+
+此外，我新增並修改了csv檔案內的連結，更符合自己的使用習慣。
+
+<img width="723" height="585" alt="image" src="https://github.com/user-attachments/assets/f11813f2-874a-4b3d-a0f3-d8bbf501d9a7" />
+
+---
+
