@@ -158,13 +158,7 @@
     <script>
         const tabs = ['學校作業', '工作工具', '休閒娛樂'];
         // 預設資料
-        let shortcuts = JSON.parse(localStorage.getItem('my_shortcuts')) || [
-            { id: '1', category: '學校作業', name: 'Google Classroom', url: 'https://classroom.google.com' },
-            { id: '2', category: '工作工具', name: 'GitHub', url: 'https://github.com' },
-            { id: '3', category: '工作工具', name: 'Stack Overflow', url: 'https://stackoverflow.com' },
-            { id: '4', category: '休閒娛樂', name: 'YouTube', url: 'https://www.youtube.com' },
-            { id: '5', category: '休閒娛樂', name: 'Netflix', url: 'https://www.netflix.com' }
-        ];
+        let shortcuts = [];
         let currentTab = tabs[0];
 
         const elements = {
@@ -179,7 +173,55 @@
             catSelect: document.getElementById('shortcutCategory')
         };
 
+        // 核心載入邏輯：LocalStorage -> fetch('shortcuts.csv') -> 硬編碼預設值
+        async function loadData() {
+            const localData = localStorage.getItem('my_shortcuts');
+            if (localData) {
+                shortcuts = JSON.parse(localData);
+                initUI();
+                return;
+            }
+
+            try {
+                // 嘗試讀取同目錄下的 shortcuts.csv
+                const response = await fetch('shortcuts.csv');
+                if (!response.ok) throw new Error('Network response was not ok');
+                const text = await response.text();
+                
+                const lines = text.split('\n').filter(l => l.trim());
+                if (lines.length >= 2) {
+                    for (let i = 1; i < lines.length; i++) {
+                        const row = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                        if (row && row.length >= 3) {
+                            const cat = row[0].replace(/^"|"$/g, '').trim();
+                            const name = row[1].replace(/^"|"$/g, '').trim().replace(/""/g, '"');
+                            const url = row[2].replace(/^"|"$/g, '').trim();
+                            if (tabs.includes(cat) && name && url) {
+                                shortcuts.push({ id: Date.now().toString() + i, category: cat, name, url });
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                // 如果 fetch 失敗 (例如直接點擊 HTML 檔案，會觸發 CORS)，則使用以下預設值
+                console.warn('無法直接從網路讀取 shortcuts.csv，採用內建預設值。', error);
+                shortcuts = [
+            { id: 'default_0', category: '學校作業', name: 'Google Classroom', url: 'https://classroom.google.com' },
+            { id: 'default_1', category: '工作工具', name: 'GitHub', url: 'https://github.com' },
+            { id: 'default_2', category: '工作工具', name: 'Stack Overflow', url: 'https://stackoverflow.com' },
+            { id: 'default_3', category: '休閒娛樂', name: 'YouTube', url: 'https://www.youtube.com' },
+            { id: 'default_4', category: '休閒娛樂', name: 'Netflix', url: 'https://www.netflix.com' }
+        ];
+            }
+            
+            initUI();
+        }
+
         function init() {
+            loadData();
+        }
+
+        function initUI() {
             loadBackground();
             initCategorySelect();
             renderTabs();
